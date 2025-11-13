@@ -67,7 +67,7 @@ def handle_message(body: MessageRequest):
         # "clip": new_clip
     }
 @app.post("/prompt")
-def handle_message(body: MessageRequest):
+def handle_prompt(body: MessageRequest):
     """
     Endpoint that handles prompt for AI script generation request from frontend.
     Matches: PostRequest("prompt", body)
