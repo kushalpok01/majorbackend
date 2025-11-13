@@ -42,7 +42,7 @@ def read_root():
 @app.post("/message")
 def handle_message(body: MessageRequest):
     """
-    Endpoint that handles AI message generation request from frontend.
+    Endpoint that handles message from frontend.
     Matches: PostRequest("message", body)
     """
     text = body.text.strip()
@@ -64,7 +64,34 @@ def handle_message(body: MessageRequest):
     # Return simulated AI result (can be text + clip)
     return {
         "message": response_text,
-        "clip": new_clip
+        # "clip": new_clip
+    }
+@app.post("/prompt")
+def handle_message(body: MessageRequest):
+    """
+    Endpoint that handles prompt for AI script generation request from frontend.
+    Matches: PostRequest("prompt", body)
+    """
+    text = body.text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Prompt text cannot be empty.")
+
+    # Simulate text processing (e.g. AI reply or speech generation)
+    response_text = f"Processed prompt: {text}"
+
+    # Simulate generating a new audio clip
+    new_clip = GeneratedClip(
+        id=str(uuid.uuid4()),
+        name=f"Clip {len(generated_clips) + 1}",
+        duration=len(text) * 0.12,  # fake duration
+        status="ready"
+    )
+    generated_clips.append(new_clip)
+
+    # Return simulated AI result (can be text + clip)
+    return {
+        "message": response_text,
+        # "clip": new_clip
     }
 
 
