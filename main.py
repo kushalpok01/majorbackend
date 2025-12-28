@@ -6,7 +6,9 @@ app = FastAPI(title="TTS Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],
+    # allow_origins=["http://localhost:8080"],
+    # allow_origins=["https://id-preview--9dfbfdc3-c5a2-4b61-955b-35cc6e5096d9.lovable.app/*"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
