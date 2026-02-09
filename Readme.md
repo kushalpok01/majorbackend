@@ -4,7 +4,7 @@
 
 ``` python -m venv myvenv ```
 
-``` source myvenv\Scripts\activate ````
+``` source myvenv\Scripts\activate ```
 
 ``` fastapi dev main.py ```
 
