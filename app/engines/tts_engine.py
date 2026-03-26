@@ -1,6 +1,5 @@
 import io
 import logging
-import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,10 +9,9 @@ from uuid import uuid4
 from gtts import gTTS
 
 from app.engines.base import TTSEngine
+from app.utils.text_validation import ensure_devanagari_text
 
 logger = logging.getLogger(__name__)
-
-_DEVANAGARI_RE = re.compile(r"[\u0900-\u097F]")
 
 
 @dataclass(frozen=True)
@@ -73,17 +71,12 @@ class HybridTTSEngine(TTSEngine):
         return self.synthesize_audio(text=text, lang="").data
 
     def synthesize_audio(self, text: str, lang: str = "") -> SynthesizedAudio:
-        clean_text = (text or "").strip()
-        if not clean_text:
-            raise RuntimeError("Input text cannot be empty")
+        clean_text = ensure_devanagari_text(text)
 
         if not self._local_ready and self._local_engine is None:
             self.load_model()
 
-        language = self._normalize_lang(lang) or self._detect_language(clean_text)
-        if language == "ne":
-            return self._synthesize_nepali(clean_text)
-        return self._synthesize_english(clean_text)
+        return self._synthesize_nepali(clean_text)
 
     def _synthesize_nepali(self, text: str) -> SynthesizedAudio:
         try:
@@ -147,10 +140,6 @@ class HybridTTSEngine(TTSEngine):
                 out_path.unlink(missing_ok=True)
             except Exception:
                 logger.warning("Temporary audio cleanup failed: %s", out_path)
-
-    @staticmethod
-    def _detect_language(text: str) -> str:
-        return "ne" if _DEVANAGARI_RE.search(text) else "en"
 
     @staticmethod
     def _normalize_lang(lang: str) -> str:

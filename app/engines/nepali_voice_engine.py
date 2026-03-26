@@ -7,6 +7,7 @@ from threading import Lock
 from uuid import uuid4
 
 from gtts import gTTS
+from app.utils.text_validation import ensure_devanagari_text
 
 logger = logging.getLogger(__name__)
 
@@ -53,9 +54,7 @@ class NepaliVoiceEngine:
                 logger.exception("Failed to load voice conversion model")
 
     def synthesize(self, text: str, target_wav_path: str) -> str:
-        clean_text = (text or "").strip()
-        if not clean_text:
-            raise ValueError("Input text cannot be empty")
+        clean_text = ensure_devanagari_text(text)
 
         target_path = Path(target_wav_path).expanduser().resolve()
         if not target_path.exists() or not target_path.is_file():

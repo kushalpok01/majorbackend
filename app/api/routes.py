@@ -6,6 +6,7 @@ from fastapi.responses import FileResponse
 
 from app.models.schemas import MessageRequest
 from app.services.tts_service import generate_speech
+from app.utils.text_validation import ensure_devanagari_text
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -21,15 +22,10 @@ def _cleanup_file(path: str) -> None:
 
 @router.post("/message")
 def text_to_speech(body: MessageRequest, background_tasks: BackgroundTasks):
-    text = (body.text or "").strip()
-    target_wav_path = (body.target_wav_path or "").strip()
-
-    if not text:
-        raise HTTPException(status_code=400, detail="Text cannot be empty")
-
-    selected_target_path = target_wav_path or str(DEFAULT_TARGET_WAV)
-
     try:
+        text = ensure_devanagari_text(body.text)
+        target_wav_path = (body.target_wav_path or "").strip()
+        selected_target_path = target_wav_path or str(DEFAULT_TARGET_WAV)
         converted_path = generate_speech(text=text, target_wav_path=selected_target_path)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
